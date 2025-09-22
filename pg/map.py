@@ -1,3 +1,10 @@
+"""Streamlit page that renders an interactive Folium map of properties.
+
+The page reads rows from Supabase via the ``Database`` helper, places a red
+marker for the default location, and adds color-coded markers for each
+property (blue for contract length <= 6 months, orange otherwise).
+"""
+
 import folium
 import streamlit as st
 from streamlit_folium import st_folium

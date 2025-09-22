@@ -1,3 +1,9 @@
+"""Streamlit page with a form for adding a new property listing.
+
+The form collects listing metadata, parses coordinates from a Google Maps
+URL, and inserts a new row into Supabase using the ``Database`` helper.
+"""
+
 import streamlit as st
 
 from property_map.db import Database
