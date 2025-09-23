@@ -15,7 +15,7 @@ with st.form("property_form", clear_on_submit=True):
     title = st.text_input("Title")
     listing_url = st.text_input("URL (e.g. facebook post)")
     google_maps_url = st.text_input("Google maps URL")
-    price = st.number_input("Price (Thai Baht)", min_value=0, max_value=20000)
+    price = st.number_input("Price (USD)", min_value=0, max_value=20000)
     contract_length = st.number_input(
         "Contract length (months)", min_value=0, max_value=12
     )
