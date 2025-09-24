@@ -2,6 +2,7 @@ import os
 from datetime import date
 
 import pandas as pd
+import streamlit as st
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
@@ -10,8 +11,8 @@ load_dotenv()  # Load environment variables from .env file
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 SCHEMA = "public"
-DATA_TABLE = "properties"
-DEFAULT_LOCATION_TABLE = "default_location"
+DATA_TABLE = "properties_CM_pub"
+DEFAULT_LOCATION_TABLE = "default_location_CM_pub"
 
 
 class Database:
@@ -55,7 +56,12 @@ class Database:
         self.schema = schema
         self.data_table = data_table
         self.default_location_table = default_location_table
-        self.client: Client = create_client(self.url, self.key)
+        self.client: Client = self.get_client()
+
+    # using _self instead of self to avoid caching problems with the self object in Streamlit
+    @st.cache_resource
+    def get_client(_self) -> Client:
+        return create_client(_self.url, _self.key)
 
     def insert_property(
         self,
@@ -107,7 +113,9 @@ class Database:
         )
         return None
 
-    def fetch_properties(self, table: str) -> pd.DataFrame:
+    # using _self instead of self to avoid caching problems with the self object in Streamlit
+    @st.cache_data
+    def fetch_properties(_self, table: str) -> pd.DataFrame:
         """Fetch properties/default location rows as a pandas DataFrame.
 
         Args:
@@ -121,12 +129,12 @@ class Database:
             ValueError: If ``table`` is not one of the supported options.
         """
         if table == "all":
-            table = self.data_table
+            table = _self.data_table
         elif table == "default_location":
-            table = self.default_location_table
+            table = _self.default_location_table
         else:
             raise ValueError(f"Invalid table: {table}")
-        response = self.client.table(table).select("*").execute()
+        response = _self.client.table(table).select("*").execute()
         data = response.data
         df = pd.DataFrame(data)
         return df
