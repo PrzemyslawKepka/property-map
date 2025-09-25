@@ -6,60 +6,70 @@ property (blue for contract length <= 6 months, orange otherwise).
 """
 
 import folium
-import pandas as pd
 import streamlit as st
 from streamlit_folium import st_folium
 
 from property_map.db import Database
 
-st.header("CM monthly rentals")
-st.markdown("Status as of September 2025")
-
+# loading the data
 supabase = Database()
 df_default_location = supabase.fetch_properties(table="default_location")
 df_all = supabase.fetch_properties(table="all")
+
+# Sidebar
+# logo
+st.sidebar.image("images/app_logo.png", width=100)
+st.sidebar.divider()
+
+# info text
+st.sidebar.markdown("""
+Usage:
+* Map: click on the map to see the property details
+* Table: browse the details of all properties listed
+* Price filter: filter by price
+* Status filter: filter by status
+""")
+st.sidebar.divider()
+
+# price filter
 price_filter = st.sidebar.slider(
-    "Price filter",
+    "Price filter (in THB)",
     min_value=df_all["price"].min(),
     max_value=df_all["price"].max(),
     value=(df_all["price"].min(), df_all["price"].max()),
     step=1000,
 )
-# Create status filter options after mapping
+# status flag from numeric to descriptive
 flag_to_description = {
     0: "Full",
     1: "Free rooms",
     2: "TBD",
 }
 df_all["mid_Sep_flag"] = df_all["mid_Sep_flag"].map(flag_to_description)
-
+# status filter
 status_filter = st.sidebar.multiselect(
     "Status filter",
     options=df_all["mid_Sep_flag"].unique(),
     default=df_all["mid_Sep_flag"].unique(),
 )
-start_coords = df_default_location[["latitude", "longitude"]].iloc[0].tolist()
-m = folium.Map(location=start_coords, zoom_start=13)
 
-# Add marker for default location
-for index, row in df_default_location.iterrows():
-    folium.Marker(
-        location=[row["latitude"], row["longitude"]],
-        tooltip=row["title"],
-        icon=folium.Icon(color="red", icon="heart"),
-    ).add_to(m)
-
-# Add markers for each row in the DataFrame
+# filter the data
 price_mask = (df_all["price"] >= price_filter[0]) & (df_all["price"] <= price_filter[1])
-
-# Handle multiselect status filter
-if status_filter:  # If any status options are selected
-    status_mask = df_all["mid_Sep_flag"].isin(status_filter)
-else:  # If no status options are selected, show nothing
-    status_mask = pd.Series([False] * len(df_all), index=df_all.index)
-
+status_mask = df_all["mid_Sep_flag"].isin(status_filter)
 filtered_df = df_all[price_mask & status_mask]
 
+# Main display
+st.header("CM monthly rentals")
+st.markdown("Status as of September 2025")
+
+# Map
+# get the median latitude and longitude
+median_latitude = df_all["latitude"].median()
+median_longitude = df_all["longitude"].median()
+start_coords = [median_latitude, median_longitude]
+m = folium.Map(location=start_coords, zoom_start=13)
+
+# Add markers for each row in the DataFrame
 for index, row in filtered_df.iterrows():
     current_description = "" if not row["mid_Sep_status"] else row["mid_Sep_status"]
     popup_text = f"""<b>{row["title"]}</b><br>
@@ -87,7 +97,7 @@ for index, row in filtered_df.iterrows():
     ).add_to(m)
 
 
-st_folium(m, width=800, height=600)
+st_folium(m, width=700, height=525)
 
 st.markdown(
     """
@@ -95,6 +105,8 @@ st.markdown(
     :orange[Orange] - Availability not confirmed or partially confirmed |
     :red[Red] - Confirmed as fully booked"""
 )
+
+# st.divider()
 
 cols_to_display = [
     "title",
@@ -107,17 +119,23 @@ cols_to_display = [
 ]
 
 st.dataframe(
-    filtered_df[cols_to_display],
+    filtered_df[cols_to_display].sort_values(by="title", ascending=True),
     column_config={
         "title": st.column_config.Column("Title"),
-        "listing_url": st.column_config.LinkColumn("Listing URL", width="small"),
+        "listing_url": st.column_config.LinkColumn("Listing URL", width="medium"),
         "google_maps_url": st.column_config.LinkColumn(
-            "Google Maps URL", width="small"
+            "Google Maps URL", width="medium"
         ),
-        "price": st.column_config.NumberColumn("Price", width=5),
+        "price": st.column_config.NumberColumn("Price (in THB)", width=8),
         "mid_Sep_status": st.column_config.Column(
             "Mid-September Description", width="medium"
         ),
         "mid_Sep_flag": st.column_config.Column("Mid-September Status", width="small"),
     },
+)
+
+st.markdown(
+    """
+    * Please note that the lack of availablity was checked mostly
+        around 15th-17th September 2025, so it might be worth to re-check"""
 )
