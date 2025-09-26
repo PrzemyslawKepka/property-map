@@ -30,8 +30,8 @@ except (TypeError, AttributeError):
     pass
 
 if st.session_state["is_mobile"]:
-    map_width = 500
-    map_height = 375
+    map_width = 350
+    map_height = 263
     popup_width = 200
     popup_text_font_size = "12px"
     popup_image_width = "150"
