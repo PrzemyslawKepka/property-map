@@ -40,6 +40,7 @@ PERFORMANCE_CONFIG = {
     "enable_dataframe_sorting_cache": True,
     "enable_session_state_persistence": True,
     "min_filtered_count_for_rerender": 1,
+    "debug_mode": False,  # Set to True to enable debug logging
 }
 
 # Responsive design settings

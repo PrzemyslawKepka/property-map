@@ -91,6 +91,11 @@ def load_property_data():
 # Load data with caching
 df_default_location, df_all = load_property_data()
 
+# Debug logging if enabled
+if PERFORMANCE_CONFIG["debug_mode"]:
+    st.write(f"Debug: Loaded {len(df_all)} properties from database")
+    st.write(f"Debug: Data columns: {list(df_all.columns)}")
+
 # Sidebar
 # logo
 st.sidebar.image("images/app_logo.png", width=100)
@@ -236,15 +241,28 @@ def create_optimized_tooltip(row):
     return tooltip_text
 
 
-# Add markers for each row in the DataFrame (only if filtered data changed)
-if PERFORMANCE_CONFIG["enable_marker_caching"] and (
-    "last_filtered_count" not in st.session_state
+# Add markers for each row in the DataFrame
+# Use caching optimization if enabled, otherwise always create markers
+should_create_markers = (
+    not PERFORMANCE_CONFIG["enable_marker_caching"]
+    or "last_filtered_count" not in st.session_state
     or st.session_state["last_filtered_count"] != len(filtered_df)
-):
-    # Clear existing markers (if any)
-    for key in list(st.session_state.keys()):
-        if key.startswith("marker_"):
-            del st.session_state[key]
+)
+
+# Debug logging if enabled
+if PERFORMANCE_CONFIG["debug_mode"]:
+    st.write(f"Debug: Filtered data count: {len(filtered_df)}")
+    st.write(f"Debug: Should create markers: {should_create_markers}")
+    st.write(
+        f"Debug: Marker caching enabled: {PERFORMANCE_CONFIG['enable_marker_caching']}"
+    )
+
+if should_create_markers:
+    # Clear existing markers (if any) when using caching
+    if PERFORMANCE_CONFIG["enable_marker_caching"]:
+        for key in list(st.session_state.keys()):
+            if key.startswith("marker_"):
+                del st.session_state[key]
 
     # Add new markers
     for index, row in filtered_df.iterrows():
@@ -273,8 +291,9 @@ if PERFORMANCE_CONFIG["enable_marker_caching"] and (
             ),
         ).add_to(m)
 
-    # Update marker count in session state
-    st.session_state["last_filtered_count"] = len(filtered_df)
+    # Update marker count in session state when using caching
+    if PERFORMANCE_CONFIG["enable_marker_caching"]:
+        st.session_state["last_filtered_count"] = len(filtered_df)
 
 
 st_folium(m, width=map_width, height=map_height)
