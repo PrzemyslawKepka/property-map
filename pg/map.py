@@ -24,7 +24,7 @@ st.sidebar.divider()
 # info text
 st.sidebar.markdown("""
 Usage:
-* Map: click on the map to see the property details
+* Map: click on the property to see the details
 * Table: browse the details of all properties listed
 * Price filter: filter by price
 * Status filter: filter by status
@@ -77,8 +77,13 @@ for index, row in filtered_df.iterrows():
                     <b>description</b>: {row["description"]}<br>
                     <b>mid-September status</b>: {current_description} <br>
                     <a href='{row["listing_url"]}' target='_blank'>Link</a><br>
-                    <a href='{row["google_maps_url"]}' target='_blank'>Google Maps Link</a>"""
+                    <a href='{row["google_maps_url"]}' target='_blank'>Google Maps Link</a><br>
+                    <img src="{row["image_url"]}" width="200" height="150">
+                    """
     popup = folium.Popup(html=popup_text, max_width=300)
+    tooltip_text = f"""<b>{row["title"]}</b><br>
+                    <img src="{row["image_url"]}" width="100" height="75">
+                    """
 
     # Map the descriptive text back to numeric values for color coding
     description_to_flag = {"Full": 0, "Free rooms": 1, "TBD": 2}
@@ -89,7 +94,7 @@ for index, row in filtered_df.iterrows():
     folium.Marker(
         location=[row["latitude"], row["longitude"]],
         popup=popup,
-        tooltip=row["title"],
+        tooltip=tooltip_text,
         icon=folium.Icon(
             color=icon_color,
             icon="home",
@@ -102,13 +107,14 @@ st_folium(m, width=700, height=525)
 st.markdown(
     """
     :green[Green] - Availability confirmed |
-    :orange[Orange] - Availability not confirmed or partially confirmed |
+    :orange[Orange] - Availability not checked or not confirmed (TBD) |
     :red[Red] - Confirmed as fully booked"""
 )
 
 # st.divider()
 
 cols_to_display = [
+    "image_url",
     "title",
     "listing_url",
     "google_maps_url",
@@ -121,6 +127,7 @@ cols_to_display = [
 st.dataframe(
     filtered_df[cols_to_display].sort_values(by="title", ascending=True),
     column_config={
+        "image_url": st.column_config.ImageColumn("Image", width="small"),
         "title": st.column_config.Column("Title"),
         "listing_url": st.column_config.LinkColumn("Listing URL", width="medium"),
         "google_maps_url": st.column_config.LinkColumn(
@@ -136,6 +143,7 @@ st.dataframe(
 
 st.markdown(
     """
-    * Please note that the lack of availablity was checked mostly
-        around 15th-17th September 2025, so it might be worth to re-check"""
+    * Please note that the availability was checked mostly
+        around 15th-17th September 2025, so it could have changed sice then
+        and should be re-checked"""
 )
