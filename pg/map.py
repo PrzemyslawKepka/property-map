@@ -8,8 +8,18 @@ property (blue for contract length <= 6 months, orange otherwise).
 import folium
 import streamlit as st
 from streamlit_folium import st_folium
+from streamlit_javascript import st_javascript
+from user_agents import parse
 
 from property_map.db import Database
+
+if "is_mobile" not in st.session_state:
+    st.session_state["is_mobile"] = False
+
+
+user_agent = parse(st_javascript("window.navigator.userAgent"))
+if user_agent.is_mobile:
+    st.session_state["is_mobile"] = True
 
 # loading the data
 supabase = Database()
@@ -94,7 +104,7 @@ for index, row in filtered_df.iterrows():
     folium.Marker(
         location=[row["latitude"], row["longitude"]],
         popup=popup,
-        tooltip=tooltip_text,
+        tooltip=None if st.session_state["is_mobile"] else tooltip_text,
         icon=folium.Icon(
             color=icon_color,
             icon="home",
