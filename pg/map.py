@@ -33,12 +33,16 @@ if st.session_state["is_mobile"]:
     map_width = 500
     map_height = 375
     popup_width = 200
-    popup_text_font_size = 100
+    popup_text_font_size = "12px"
+    popup_image_width = "150"
+    popup_image_height = "113"
 else:
     map_width = 700
     map_height = 525
     popup_width = 300
-    popup_text_font_size = 150
+    popup_text_font_size = "14px"
+    popup_image_width = "200"
+    popup_image_height = "150"
 
 # loading the data
 supabase = Database()
@@ -101,13 +105,15 @@ m = folium.Map(location=start_coords, zoom_start=13)
 # Add markers for each row in the DataFrame
 for index, row in filtered_df.iterrows():
     current_description = "" if not row["mid_Sep_status"] else row["mid_Sep_status"]
-    popup_text = f"""<b>{row["title"]}</b><br>
+    popup_text = f"""<div style="font-size: {popup_text_font_size};">
+                    <b>{row["title"]}</b><br>
                     <b>monthly price</b>: {row["price"]} THB <br>
                     <b>description</b>: {row["description"]}<br>
                     <b>mid-September status</b>: {current_description} <br>
                     <a href='{row["listing_url"]}' target='_blank'>Link</a><br>
                     <a href='{row["google_maps_url"]}' target='_blank'>Google Maps Link</a><br>
-                    <img src="{row["image_url"]}" width="200" height="150" style="font-size: {popup_text_font_size}px">
+                    <img src="{row["image_url"]}" width="{popup_image_width}" height="{popup_image_height}">
+                    </div>
                     """
     popup = folium.Popup(html=popup_text, max_width=popup_width)
     tooltip_text = f"""<b>{row["title"]}</b><br>
