@@ -17,9 +17,17 @@ if "is_mobile" not in st.session_state:
     st.session_state["is_mobile"] = False
 
 
-user_agent = parse(st_javascript("window.navigator.userAgent"))
-if user_agent.is_mobile:
-    st.session_state["is_mobile"] = True
+# Get user agent with error handling
+try:
+    user_agent_string = st_javascript("window.navigator.userAgent")
+    # Check if we got a valid string (not 0 or None during loading)
+    if user_agent_string and isinstance(user_agent_string, str):
+        user_agent = parse(user_agent_string)
+        if user_agent.is_mobile:
+            st.session_state["is_mobile"] = True
+except (TypeError, AttributeError):
+    # Handle cases where user_agent_string is not a string (like 0 during loading)
+    pass
 
 # loading the data
 supabase = Database()
