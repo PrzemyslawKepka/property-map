@@ -91,10 +91,6 @@ def load_property_data():
 # Load data with caching
 df_default_location, df_all = load_property_data()
 
-# Debug logging if enabled
-if PERFORMANCE_CONFIG["debug_mode"]:
-    st.write(f"Debug: Loaded {len(df_all)} properties from database")
-    st.write(f"Debug: Data columns: {list(df_all.columns)}")
 
 # Sidebar
 # logo
@@ -242,12 +238,6 @@ def create_optimized_tooltip(row):
 
 # Add markers for each row in the DataFrame
 # Always create markers since we can't cache the map with markers
-# Debug logging if enabled
-if PERFORMANCE_CONFIG["debug_mode"]:
-    st.write(f"Debug: Filtered data count: {len(filtered_df)}")
-    st.write("Debug: Adding markers to map...")
-
-# Add markers to the map
 for index, row in filtered_df.iterrows():
     popup = create_optimized_popup(
         row,
@@ -273,10 +263,6 @@ for index, row in filtered_df.iterrows():
             icon="home",
         ),
     ).add_to(m)
-
-# Debug logging if enabled
-if PERFORMANCE_CONFIG["debug_mode"]:
-    st.write(f"Debug: Added {len(filtered_df)} markers to map")
 
 
 st_folium(m, width=map_width, height=map_height)
