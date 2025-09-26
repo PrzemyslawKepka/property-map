@@ -6,6 +6,8 @@ import streamlit as st
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
+from property_map.config import CACHE_TTL
+
 load_dotenv()  # Load environment variables from .env file
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -59,7 +61,7 @@ class Database:
         self.client: Client = self.get_client()
 
     # using _self instead of self to avoid caching problems with the self object in Streamlit
-    @st.cache_resource
+    @st.cache_resource(ttl=CACHE_TTL["client"])  # Cache client for configured duration
     def get_client(_self) -> Client:
         return create_client(_self.url, _self.key)
 
@@ -114,7 +116,7 @@ class Database:
         return None
 
     # using _self instead of self to avoid caching problems with the self object in Streamlit
-    @st.cache_data
+    @st.cache_data(ttl=CACHE_TTL["processing"])  # Cache data for configured duration
     def fetch_properties(_self, table: str) -> pd.DataFrame:
         """Fetch properties/default location rows as a pandas DataFrame.
 
