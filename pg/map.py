@@ -29,6 +29,15 @@ except (TypeError, AttributeError):
     # Handle cases where user_agent_string is not a string (like 0 during loading)
     pass
 
+if st.session_state["is_mobile"]:
+    map_width = 500
+    map_height = 375
+    popup_width = 200
+else:
+    map_width = 700
+    map_height = 525
+    popup_width = 300
+
 # loading the data
 supabase = Database()
 df_default_location = supabase.fetch_properties(table="default_location")
@@ -98,7 +107,7 @@ for index, row in filtered_df.iterrows():
                     <a href='{row["google_maps_url"]}' target='_blank'>Google Maps Link</a><br>
                     <img src="{row["image_url"]}" width="200" height="150">
                     """
-    popup = folium.Popup(html=popup_text, max_width=300)
+    popup = folium.Popup(html=popup_text, max_width=popup_width)
     tooltip_text = f"""<b>{row["title"]}</b><br>
                     <img src="{row["image_url"]}" width="100" height="75">
                     """
@@ -120,7 +129,7 @@ for index, row in filtered_df.iterrows():
     ).add_to(m)
 
 
-st_folium(m, width=700, height=525)
+st_folium(m, width=map_width, height=map_height)
 
 st.markdown(
     """
