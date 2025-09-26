@@ -50,14 +50,14 @@ if st.session_state["is_mobile"]:
         map_width * 1.2
     )  # Taller aspect ratio (5:6) for better map visibility
     popup_width = max(150, min(map_width - 50, 200))  # Responsive popup width
-    popup_text_font_size = "12px"
+    popup_text_font_size = "13px"
     popup_image_width = "150"
     popup_image_height = "113"
 else:
     map_width = 800  # Slightly wider for desktop too
     map_height = 600  # Taller for desktop as well
     popup_width = 300
-    popup_text_font_size = "14px"
+    popup_text_font_size = "15px"
     popup_image_width = "200"
     popup_image_height = "150"
 
