@@ -36,11 +36,11 @@ IMAGE_CONFIG = {
 
 # Performance settings
 PERFORMANCE_CONFIG = {
-    "enable_marker_caching": True,
+    "enable_marker_caching": False,  # Disabled - causes issues with Folium map caching
     "enable_dataframe_sorting_cache": True,
     "enable_session_state_persistence": True,
     "min_filtered_count_for_rerender": 1,
-    "debug_mode": False,  # Set to True to enable debug logging
+    "debug_mode": True,  # Set to True to enable debug logging
 }
 
 # Responsive design settings

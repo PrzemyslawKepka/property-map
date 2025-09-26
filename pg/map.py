@@ -176,8 +176,7 @@ st.header("CM monthly rentals")
 st.markdown("Status as of September 2025")
 
 
-# Cache map creation to avoid recreating on every interaction
-@st.cache_data
+# Create base map (don't cache - markers need to be added to fresh map)
 def create_base_map(df_all):
     """Create base map with center coordinates."""
     median_latitude = df_all["latitude"].median()
@@ -242,58 +241,42 @@ def create_optimized_tooltip(row):
 
 
 # Add markers for each row in the DataFrame
-# Use caching optimization if enabled, otherwise always create markers
-should_create_markers = (
-    not PERFORMANCE_CONFIG["enable_marker_caching"]
-    or "last_filtered_count" not in st.session_state
-    or st.session_state["last_filtered_count"] != len(filtered_df)
-)
-
+# Always create markers since we can't cache the map with markers
 # Debug logging if enabled
 if PERFORMANCE_CONFIG["debug_mode"]:
     st.write(f"Debug: Filtered data count: {len(filtered_df)}")
-    st.write(f"Debug: Should create markers: {should_create_markers}")
-    st.write(
-        f"Debug: Marker caching enabled: {PERFORMANCE_CONFIG['enable_marker_caching']}"
+    st.write("Debug: Adding markers to map...")
+
+# Add markers to the map
+for index, row in filtered_df.iterrows():
+    popup = create_optimized_popup(
+        row,
+        popup_text_font_size,
+        popup_width,
+        popup_image_width,
+        popup_image_height,
     )
+    tooltip_text = create_optimized_tooltip(row)
 
-if should_create_markers:
-    # Clear existing markers (if any) when using caching
-    if PERFORMANCE_CONFIG["enable_marker_caching"]:
-        for key in list(st.session_state.keys()):
-            if key.startswith("marker_"):
-                del st.session_state[key]
+    # Map the descriptive text back to numeric values for color coding
+    description_to_flag = {"Full": 0, "Free rooms": 1, "TBD": 2}
+    numeric_flag = description_to_flag[row["mid_Sep_flag"]]
+    status_flags = {0: "red", 1: "green", 2: "orange"}
+    icon_color = status_flags[numeric_flag]
 
-    # Add new markers
-    for index, row in filtered_df.iterrows():
-        popup = create_optimized_popup(
-            row,
-            popup_text_font_size,
-            popup_width,
-            popup_image_width,
-            popup_image_height,
-        )
-        tooltip_text = create_optimized_tooltip(row)
+    folium.Marker(
+        location=[row["latitude"], row["longitude"]],
+        popup=popup,
+        tooltip=None if st.session_state["is_mobile"] else tooltip_text,
+        icon=folium.Icon(
+            color=icon_color,
+            icon="home",
+        ),
+    ).add_to(m)
 
-        # Map the descriptive text back to numeric values for color coding
-        description_to_flag = {"Full": 0, "Free rooms": 1, "TBD": 2}
-        numeric_flag = description_to_flag[row["mid_Sep_flag"]]
-        status_flags = {0: "red", 1: "green", 2: "orange"}
-        icon_color = status_flags[numeric_flag]
-
-        folium.Marker(
-            location=[row["latitude"], row["longitude"]],
-            popup=popup,
-            tooltip=None if st.session_state["is_mobile"] else tooltip_text,
-            icon=folium.Icon(
-                color=icon_color,
-                icon="home",
-            ),
-        ).add_to(m)
-
-    # Update marker count in session state when using caching
-    if PERFORMANCE_CONFIG["enable_marker_caching"]:
-        st.session_state["last_filtered_count"] = len(filtered_df)
+# Debug logging if enabled
+if PERFORMANCE_CONFIG["debug_mode"]:
+    st.write(f"Debug: Added {len(filtered_df)} markers to map")
 
 
 st_folium(m, width=map_width, height=map_height)
