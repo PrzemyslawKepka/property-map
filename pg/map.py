@@ -33,10 +33,12 @@ if st.session_state["is_mobile"]:
     map_width = 500
     map_height = 375
     popup_width = 200
+    popup_text_font_size = 100
 else:
     map_width = 700
     map_height = 525
     popup_width = 300
+    popup_text_font_size = 150
 
 # loading the data
 supabase = Database()
@@ -105,7 +107,7 @@ for index, row in filtered_df.iterrows():
                     <b>mid-September status</b>: {current_description} <br>
                     <a href='{row["listing_url"]}' target='_blank'>Link</a><br>
                     <a href='{row["google_maps_url"]}' target='_blank'>Google Maps Link</a><br>
-                    <img src="{row["image_url"]}" width="200" height="150">
+                    <img src="{row["image_url"]}" width="200" height="150" style="font-size: {popup_text_font_size}px">
                     """
     popup = folium.Popup(html=popup_text, max_width=popup_width)
     tooltip_text = f"""<b>{row["title"]}</b><br>
