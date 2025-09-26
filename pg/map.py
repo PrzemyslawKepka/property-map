@@ -44,16 +44,18 @@ if st.session_state["is_mobile"]:
     # Use actual screen width minus some padding for mobile
     screen_width = st.session_state.get("screen_width", 375)
     map_width = max(
-        300, min(screen_width - 40, 500)
-    )  # Min 300px, max 500px, with 40px padding
-    map_height = int(map_width * 0.75)  # Maintain 4:3 aspect ratio
+        320, min(screen_width - 20, 600)
+    )  # Min 320px, max 600px, with 20px padding
+    map_height = int(
+        map_width * 1.2
+    )  # Taller aspect ratio (5:6) for better map visibility
     popup_width = max(150, min(map_width - 50, 200))  # Responsive popup width
     popup_text_font_size = "12px"
     popup_image_width = "150"
     popup_image_height = "113"
 else:
-    map_width = 700
-    map_height = 525
+    map_width = 800  # Slightly wider for desktop too
+    map_height = 600  # Taller for desktop as well
     popup_width = 300
     popup_text_font_size = "14px"
     popup_image_width = "200"
