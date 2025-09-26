@@ -17,22 +17,37 @@ if "is_mobile" not in st.session_state:
     st.session_state["is_mobile"] = False
 
 
-# Get user agent with error handling
+# Get user agent and screen width with error handling
 try:
     user_agent_string = st_javascript("window.navigator.userAgent")
-    # Check if we got a valid string (not 0 or None during loading)
+    screen_width = st_javascript("window.innerWidth")
+
+    # Check if we got valid values (not 0 or None during loading)
     if user_agent_string and isinstance(user_agent_string, str):
         user_agent = parse(user_agent_string)
         if user_agent.is_mobile:
             st.session_state["is_mobile"] = True
-except (TypeError, AttributeError):
-    # Handle cases where user_agent_string is not a string (like 0 during loading)
-    pass
 
+    # Get screen width for responsive sizing
+    if screen_width and isinstance(screen_width, (int, float)) and screen_width > 0:
+        st.session_state["screen_width"] = int(screen_width)
+    else:
+        # Fallback to default mobile width if detection fails
+        st.session_state["screen_width"] = 375
+
+except (TypeError, AttributeError):
+    # Handle cases where JavaScript returns invalid values during loading
+    st.session_state["screen_width"] = 375  # Default mobile width
+
+# Set responsive dimensions
 if st.session_state["is_mobile"]:
-    map_width = 350
-    map_height = 263
-    popup_width = 200
+    # Use actual screen width minus some padding for mobile
+    screen_width = st.session_state.get("screen_width", 375)
+    map_width = max(
+        300, min(screen_width - 40, 500)
+    )  # Min 300px, max 500px, with 40px padding
+    map_height = int(map_width * 0.75)  # Maintain 4:3 aspect ratio
+    popup_width = max(150, min(map_width - 50, 200))  # Responsive popup width
     popup_text_font_size = "12px"
     popup_image_width = "150"
     popup_image_height = "113"
