@@ -177,7 +177,9 @@ cols_to_display = [
 ]
 
 st.dataframe(
-    filtered_df[cols_to_display].sort_values(by="title", ascending=True),
+    filtered_df[cols_to_display]
+    .sort_values(by="title", ascending=True)
+    .reset_index(drop=True),
     column_config={
         "image_url": st.column_config.ImageColumn("Image", width="small"),
         "title": st.column_config.Column("Title"),
@@ -196,6 +198,6 @@ st.dataframe(
 st.markdown(
     """
     * Please note that the availability was checked mostly
-        around 15th-17th September 2025, so it could have changed sice then
+        around 15th-17th September 2025, so it could have changed since then
         and should be re-checked"""
 )
