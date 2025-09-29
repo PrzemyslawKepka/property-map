@@ -123,8 +123,6 @@ st.markdown(
         .block-container {
             padding-top: 0.1rem; /* Adjust this value as needed */
             padding-bottom: 3rem;
-            padding-left: 5rem;
-            padding-right: 5rem;
         }
         </style>
         """,
