@@ -69,7 +69,7 @@ df_all = supabase.fetch_properties(table="all")
 st.set_page_config(
     page_title="Chiang Mai rentals",
     page_icon="images/app_logo.png",
-    layout="wide",
+    # layout="wide",
     initial_sidebar_state="collapsed" if st.session_state["is_mobile"] else "expanded",
 )
 
