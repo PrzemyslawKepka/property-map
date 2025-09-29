@@ -59,7 +59,7 @@ class Database:
         self.client: Client = self.get_client()
 
     # using _self instead of self to avoid caching problems with the self object in Streamlit
-    @st.cache_resource
+    @st.cache_resource(ttl="1h")
     def get_client(_self) -> Client:
         return create_client(_self.url, _self.key)
 
@@ -114,7 +114,7 @@ class Database:
         return None
 
     # using _self instead of self to avoid caching problems with the self object in Streamlit
-    @st.cache_data
+    @st.cache_data(ttl="1h")
     def fetch_properties(_self, table: str) -> pd.DataFrame:
         """Fetch properties/default location rows as a pandas DataFrame.
 
