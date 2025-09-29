@@ -66,6 +66,13 @@ supabase = Database()
 df_default_location = supabase.fetch_properties(table="default_location")
 df_all = supabase.fetch_properties(table="all")
 
+st.set_page_config(
+    page_title="Chiang Mai rentals",
+    page_icon="images/app_logo.png",
+    layout="wide",
+    initial_sidebar_state="collapsed" if st.session_state["is_mobile"] else "expanded",
+)
+
 # Sidebar
 # logo
 st.sidebar.image("images/app_logo.png", width=100)
@@ -109,8 +116,32 @@ status_mask = df_all["mid_Sep_flag"].isin(status_filter)
 filtered_df = df_all[price_mask & status_mask]
 
 # Main display
-st.header("CM monthly rentals")
-st.markdown("Status as of September 2025")
+# adjust the padding
+st.markdown(
+    """
+        <style>
+        .block-container {
+            padding-top: 0.1rem; /* Adjust this value as needed */
+            padding-bottom: 3rem;
+            padding-left: 5rem;
+            padding-right: 5rem;
+        }
+        </style>
+        """,
+    unsafe_allow_html=True,
+)
+# main header
+st.header("Chiang Mai monthly rentals")
+st.markdown("Welcome to the Chiang Mai monthly rentals app!")
+st.markdown(
+    "Below you can find a list of properties in Chiang Mai, offering monthly rentals."
+)
+st.markdown("Status: up-to-date as of **:blue[September 2025]**")
+
+if st.session_state["is_mobile"]:
+    st.markdown(
+        "Please expand the sidebar, using the button in the top left corner, to see an additional filters."
+    )
 
 # Map
 # get the median latitude and longitude
