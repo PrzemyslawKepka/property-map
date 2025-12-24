@@ -5,7 +5,7 @@ Core features:
 - Save apartment listings via a simple form
 - Visualize saved listings on an interactive map
 
-<img src="https://github.com/PrzemyslawKepka/property-map/blob/main/images/property_map.png" />
+![App interface](images/property_map.png)
 
 So as a result, the map allows an easier navigation through all the listings that you want to keep an eye on, which ultimately should lead to a smoother process of finding an ideal place.
 
