@@ -3,9 +3,12 @@ The app was created as a helper tool in a process of finding an apartment to ren
 
 Core features:
 - Save apartment listings via a simple form
+
+<img src="images/property_form.png" alt="Form" width="500" />
+
 - Visualize saved listings on an interactive map
 
-![App interface](images/property_map.png)
+<img src="images/property_map.png" alt="Map" width="500" />
 
 So as a result, the map allows an easier navigation through all the listings that you want to keep an eye on, which ultimately should lead to a smoother process of finding an ideal place.
 
